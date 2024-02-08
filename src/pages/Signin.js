@@ -1,24 +1,48 @@
 import {useNavigate } from "react-router-dom";
 // import Signup from "./Signup";
-import { useState } from "react";
-// import Signup from "./Signup";
-// import Home from "./Home";
+import { useEffect, useState } from "react";
 
 const Signin = ()=>{
-    const navigate = useNavigate();
-    const [username,setuname] = useState("");
+  // const [isAuthenticated,setAuthenticated] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (localStorage.getItem('loggedInUser') && JSON.parse(localStorage.getItem('loggedInUser'))) {
+      navigate("/Home" , {replace:true});
+    }
+  }, []);
+    // const [formData,setFormData]=useState({
+    //   name:"",
+    //   pswd:"",
+    //   showPassword:"",
+    // })
+    // setFormData(prevdata=>{
+    //   ...prevData,
+      
+    // })
+    // const [username,setuname] = useState("");
     const [password,setPassword] = useState("");
+    const [emailname,setEmail] = useState("");
     const [showPassword,setShowPassword] = useState("false");
+    const userdetails={
+        email:emailname,
+        pswd:password,
+    }
     
     const handleSignIn = () => {
     
         // Retrieve user details from local storage
         const storedUser = JSON.parse(localStorage.getItem("user"))
-        const founduser=storedUser?.find((item)=>item.username===username)
+
+        const founduser=storedUser?.find((item)=>item.email===emailname)
         if(!founduser){
           alert("User doesn't exists")
         }
-        else if(founduser.password === password && founduser.username === username){
+        else if(founduser?.password === password && founduser?.email === emailname){
+          console.log("userdetails",userdetails)
+          localStorage.setItem('loggedInUser', JSON.stringify(userdetails));
+          // setAuthenticated(true);
           navigate('/Home')
         }
         else {
@@ -49,18 +73,19 @@ const Signin = ()=>{
         <h1>Welcome! Login here</h1>
         <form className="sign">
         <br/>
-        <label  > UserName
+        <label className="required" > Email</label>
+
             <br/>
-            <input type="text"  placeholder="Enter your Username" required value={username}
+            <input type="email"  placeholder="Enter your email" value={emailname}
             onChange={(e) =>
-            setuname(e.target.value)}
+            setEmail(e.target.value)}
             
             />
             
-        </label>
         <br/>
         <br/>
-        <label> Password
+        <label className="required"> Password</label>
+
             <br/>
             <input type={showPassword ? "password" : "text"} placeholder="Enter your password" value={password}
                     onChange={(e) =>
@@ -68,24 +93,31 @@ const Signin = ()=>{
                         
                         // console.log(e)
                     }/>
-        </label>
         <br/>
-        <br/>
-               
-                <label for="check">Show Password</label>
-                <br/>
+        <div className="check">
+                         
+          <label htmlFor="check">Show Password</label>
                 <input
                     id="check"
                     type="checkbox"
+                    // name="name"
                     value={showPassword}
                     onChange={() =>
                         setShowPassword((prev) => !prev)
                     }
                 />
+
+        </div>
                 
         </form>
-       <button onClick={handleSignIn}> Log In</button>
-       <button onClick={()=> navigate("/Signup")} >New User</button>
+        <div className="btn">
+          <button onClick={handleSignIn}> Log In</button>
+          <div className="right_btn">
+          <button onClick={()=> navigate("/Signup")} >New User</button>
+
+          </div>
+        </div>
+       
       </div>
     );
     
